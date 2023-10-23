@@ -1,6 +1,7 @@
 import os.path
 
 from libs.helper import *
+from libs.database import *
 import streamlit as st
 import uuid
 import pandas as pd
@@ -269,7 +270,7 @@ area_error = st.empty()
 st.write("\n")
 st.header("IELTS Assistant")
 tap_input, tap_context, tap_model, tab_func = st.tabs(
-    ["💬 聊天", "🗒️ 预设", "⚙️ 模型", "🛠️ 功能"]
+    ["💬 备考Part1", "🗒️ 预设Part1", "⚙️ 模型", "🛠️ 功能"]
 )
 
 with tap_context:
@@ -426,6 +427,20 @@ with tap_input:
             if df_history.empty or len(df_history.query('role!="system"')) == 0:
                 new_name = extract_chars(user_input_content, 18)
                 reset_chat_name_fun(new_name)
+
+
+    tests_part1_list = ["话题: %s ;\t出题年份: %s ;\t问题: %s" % (a.topic, a.used_year, a.question) for a in session.query(TestsPart1).all()]
+    # context_select_index = set_context_list.index(
+    #     st.session_state["context_select" + current_chat + "value"]
+    # )
+    st.selectbox(
+        label="选择Part1备考试题",
+        options=tests_part1_list,
+        key="test_part1_select" + current_chat,
+        # index= context_select_index,
+        on_change=callback_fun,
+        args=("context_select1",),
+    )
 
     with st.form("input_form", clear_on_submit=True):
         user_input = st.text_area(
